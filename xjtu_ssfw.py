@@ -7,32 +7,6 @@ import re
 from HTMLParser import HTMLParser
 from xjtu_grade_parser import *
 
-# A HTML Parser to get the keys for login
-class HTMLParserForKey(HTMLParser):
-
-	def __init__(self):
-		HTMLParser.__init__(self)
-		self.lt = None
-		self.execution = None
-
-	def handle_starttag(self, tag, attrs):
-		if tag == "input" and ('type', 'hidden') in attrs:
-			if ('name', 'lt') in attrs:
-				self.lt = attrs[2][1]
-			elif ('name', 'execution') in attrs:
-				self.execution = attrs[2][1]
-
-# A HTML Parser to get direct URL
-class HTMLParserForUrl(HTMLParser):
-	def __init__(self):
-		HTMLParser.__init__(self)
-		self.url = None
-
-	def handle_starttag(self, tag, attrs):
-		if tag == "a" and ('class', 'popup-with-zoom-anim') in attrs:
-			self.url = attrs[2][1][8:-3]
-
-
 class XJTU:
 
 	def __init__(self):
@@ -51,7 +25,7 @@ class XJTU:
 		self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookies))
 
 	# Get grades page
-	def getPage(self, lt, exe):
+	def get_page(self, lt, exe):
 
 		# Generate POST data
 		self.postdata = urllib.urlencode({
@@ -70,29 +44,27 @@ class XJTU:
 		result = self.opener.open(request)
 		# Get direct URL
 		html = result.read().decode('utf-8')
-		hp = HTMLParserForUrl()
-		hp.feed(html)
-		hp.close()
+		pattern = re.compile(r"ct\('(.+?)'")
+		url = re.findall(pattern, html)
 
 		# Direct URL
-		result = self.opener.open(hp.url)
+		result = self.opener.open(url[0])
 
 		# Get grades page
 		result = self.opener.open(self.gradeUrl)
 		return result.read()
 
 	# get the keys for login
-	def getKey(self):
+	def get_keys(self):
 		result = self.opener.open(self.loginUrl)
 		html = result.read().decode('utf-8')
-		hp = HTMLParserForKey()
-		hp.feed(html)
-		hp.close()
-		return hp.lt, hp.execution
+		pattern = re.compile(r'type="hidden".+value="(.+?)"')
+		values = re.findall(pattern, html)
+		return values[0], values[1]
 
 if __name__ == '__main__':
 	xjtu = XJTU()
-	lt, exe = xjtu.getKey()
-	html = xjtu.getPage(lt, exe)
+	lt, exe = xjtu.get_keys()
+	html = xjtu.get_page(lt, exe)
 	xjtuGradeParser = XjtuGradeParser()
 	xjtuGradeParser.html_parser(html)
