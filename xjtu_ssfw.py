@@ -5,6 +5,7 @@ import urllib2
 import cookielib
 import re
 from HTMLParser import HTMLParser
+from xjtu_grade_parser import *
 
 # A HTML Parser to get the keys for login
 class HTMLParserForKey(HTMLParser):
@@ -78,7 +79,7 @@ class XJTU:
 
 		# Get grades page
 		result = self.opener.open(self.gradeUrl)
-		print result.read().decode('utf-8')
+		return result.read()
 
 	# get the keys for login
 	def getKey(self):
@@ -92,4 +93,6 @@ class XJTU:
 if __name__ == '__main__':
 	xjtu = XJTU()
 	lt, exe = xjtu.getKey()
-	xjtu.getPage(lt, exe)
+	html = xjtu.getPage(lt, exe)
+	xjtuGradeParser = XjtuGradeParser()
+	xjtuGradeParser.html_parser(html)
