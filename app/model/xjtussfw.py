@@ -16,7 +16,7 @@ class XJTU:
 		self.gradeUrl = 'http://ssfw.xjtu.edu.cn/index.portal?.pn=p1142_p1144_p1156'
 		# Simulating Browser
 		self.headers = {
-			'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'
+			'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; .NET4.0C; .NET4.0E; .NET CLR 2.0.50727; .NET CLR 3.0.30729; .NET CLR 3.5.30729; InfoPath.3; rv:11.0) like Gecko'
 		}
 		self.cookies = cookielib.CookieJar()
 		self.postdata = urllib.urlencode({})
@@ -67,4 +67,6 @@ if __name__ == '__main__':
 	lt, exe = xjtu.get_keys()
 	html = xjtu.get_page(lt, exe)
 	xjtuGradeParser = XjtuGradeParser()
-	xjtuGradeParser.html_parser(html)
+	grades = xjtuGradeParser.html_parser(html)
+	for grade in grades:
+		print grade.name, grade.grades['main']

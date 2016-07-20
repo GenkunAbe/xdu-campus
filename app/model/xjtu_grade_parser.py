@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+
 import re
-from xjtu_grade import *
+from xjtucourse import *
 
 class XjtuGradeParser():
     def __init__(self):

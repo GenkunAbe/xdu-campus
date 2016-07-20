@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import urllib
 import urllib2
@@ -38,17 +38,17 @@ class XDU:
 		self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookies))
 
 	# Get grades page
-	def getPage(self, lt, exe):
+	def getPage(self, username, password, lt, exe):
 
 		# Generate POST data
 		self.postdata = urllib.urlencode({
-			'username':'15020881062',
-			'password':'881062',
-			'submit':'',
-			'lt':lt,
-			'execution':exe,
-			'_eventId':'submit',
-			'rmShown':'1'
+			'username' : username,
+			'password' : password,
+			'submit' : '',
+			'lt' : lt,
+			'execution' : exe,
+			'_eventId' : 'submit',
+			'rmShown' : '1'
 		})
 
 		# POST data
@@ -60,7 +60,7 @@ class XDU:
 
 		# Get grades page
 		result = self.opener.open(self.gradeUrl)
-		print result.read().decode('gbk')
+		return result.read().decode('gbk')
 
 	# get the keys for login
 	def getKey(self):
@@ -74,4 +74,4 @@ class XDU:
 if __name__ == '__main__':
 	xdu = XDU()
 	lt, exe = xdu.getKey()
-	xdu.getPage(lt, exe)
+	print xdu.getPage('15020881062', '881062', lt, exe)
