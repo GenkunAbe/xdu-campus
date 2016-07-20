@@ -3,5 +3,11 @@
 from ctrl.grade import GradeCtrl
 
 url = [
-    (r'/grade', GradeCtrl)
+    (r'/grade', GradeCtrl),
+    (r'/table', TableCtrl),
+    (r'/library', LibraryCtrl),
+    (r'/card', CardCtrl),
+    (r'/net', NetCtrl),
+    (r'/news', NewsCtrl),
+    
 ]
