@@ -51,5 +51,4 @@ class XjtuGradeParser():
                 'final'     : marks[6],
                 'other'     : marks[7]
             }
-        print grade
         return grade

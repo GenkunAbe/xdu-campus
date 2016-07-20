@@ -1,3 +1,5 @@
+import json
+
 class XjtuGrade:
 
     def __init__(self):
@@ -21,10 +23,28 @@ class XjtuGrade:
         }
 
     def __str__(self):
-        return '%s\n%s\n%s\n%s\n%s\n%s\t%s\t%s\t%s\t%s\t%s\t%s\n%s\n%s\n%s\n%s' % (self.term, self.code, self.name, self.type, self.status,
-            self.grades['main'], self.grades['standard'], self.grades['daily'],
-            self.grades['interim'], self.grades['expr'], self.grades['final'],
-            self.grades['other'], self.credit, self.reason, self.nature, self.vaild)
+        dic = {
+            'term' : self.term,
+            'code' : self.code,
+            'name' : self.name,
+            'type' : self.type,
+            'stauts' : self.status,
+            'credit' : self.credit,
+            'reason' : self.reason,
+            'nature' : self.nature,
+            'vaild' : self.vaild,
+            'grades' : self.grades,
+        }
+        return json.dumps(dic)
+
+class XjtuCourse:
+    
+    def __init__(self):
+        self.name       =   None
+        self.teacher    =   None
+        self.classroom  =   None
+        self.time       =   None
+
 
 
 
