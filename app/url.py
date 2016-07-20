@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from ctrl.grade import GradeCtrl
+from ctrl.
 
 url = [
     (r'/grade', GradeCtrl),
@@ -9,5 +10,4 @@ url = [
     (r'/card', CardCtrl),
     (r'/net', NetCtrl),
     (r'/news', NewsCtrl),
-    
 ]
