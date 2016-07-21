@@ -6,9 +6,7 @@
 	
 	Class Ids auto login and return vaild cookie
 	for further operation by given username & password.
-
-	If Website require verification code, ask user to
-	fill the code.
+    
 
 """
 
