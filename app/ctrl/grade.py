@@ -2,14 +2,15 @@
 
 import tornado.web
 import sys
+import json
 sys.path.append('..')
-from model.xdujwxt import XDU
+from model.jwxt import Jwxt
 
 class GradeCtrl(tornado.web.RequestHandler):
     def get(self):
         username = self.get_argument('username', '15020881062')
         password = self.get_argument('password', '881062')
-        xdu = XDU()
-        lt, exe = xdu.getKey()
-        page = xdu.getPage(username, password, lt, exe)
-        self.write(page)
+        jwxt = Jwxt()
+        grade = jwxt.get_grade(username, password)
+        grade_json = json.dumps(grade)
+        self.write(grade_json)
