@@ -12,5 +12,5 @@ class GradeCtrl(tornado.web.RequestHandler):
         password = self.get_argument('password', '881062')
         jwxt = Jwxt()
         grade = jwxt.get_grade(username, password)
-        grade_json = json.dumps(grade, cls=CourseEncoder)
+        grade_json = json.dumps(grade)
         self.write(grade_json)
