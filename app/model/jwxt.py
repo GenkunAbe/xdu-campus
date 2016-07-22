@@ -80,22 +80,15 @@ class Jwxt:
                 pattern = re.compile(r'<td.*?">\s*(.*?)\s*</td>', re.S)
                 items = re.findall(pattern, subject)
                 course = Course(items)
-                course = json.dumps(course, cls=CourseEncoder)  
+                # course = json.dumps(course, cls=CourseEncoder)  
                 courses.append(course)
             
             headpatten = re.compile(r'<a name="(.*?)" />.+?<td height="21"', re.S)
             grade[re.findall(headpatten, term)[0].decode('gbk').encode('utf-8')] = courses
-
-            
-        for (key, value) in grade.items():
-            print key
-            for course in value:
-                print course
-                
-        print grade
-        
         
         return grade
+
+
     # paras:    
     #     usr       : username
     #     psw       : password
