@@ -5,8 +5,6 @@ import hashlib
 
 font = ImageFont.truetype('CloudSongDaGBK.ttf', 18)
 
-
-
 def rand_num(txt):
 
 	x = random.randint(1, 4)
