@@ -4,7 +4,7 @@ import tornado.web
 import sys
 import json
 sys.path.append('..')
-from model.jwxt import Jwxt
+from model.jwxt import *
 
 class GradeCtrl(tornado.web.RequestHandler):
     def get(self):
