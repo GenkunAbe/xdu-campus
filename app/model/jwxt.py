@@ -19,12 +19,6 @@ import re
 import json
 
 
-urls = {
-    'grade': 'http://jwxt.xidian.edu.cn/gradeLnAllAction.do?type=ln&oper=qbinfo',
-    'table': 'http://jwxt.xidian.edu.cn/xkAction.do?actionType=6'
-}
-
-
 def list_decode(items):
     ans = []
     for i in range(len(items) - 1):
@@ -48,11 +42,12 @@ class Jwxt:
     # return:
     #     grades    : a dict which has all grades.
     def get_grade(self, usr, psw):
+        grade = "http://jwxt.xidian.edu.cn/gradeLnAllAction.do?type=ln&oper=qbinfo"
         grade = {}
         ids = Ids()
         self.cookies, pic = ids.get_ids_cookie(usr, psw)
         self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookies))
-        result = self.opener.open(urls['grade'])
+        result = self.opener.open(grade)
         html = result.read()
         patten = re.compile(r'<a name=".*?" />.*?<td height="21"', re.S)
         terms = re.findall(patten, html)
@@ -81,5 +76,32 @@ class Jwxt:
     #     psw       : password
     # return:
     #     grades    : a dict which has all course table
-    def get_table(self, usr, psw):
+    def make_addpatten(self, year, term, classnumber):
+        return "http://jwxt.xidian.edu.cn/bjKbInfoAction.do?oper=bjkb_xx&xzxjxjhh="+ year + "-" + term + "-1&xbjh=" + classnumber + "&xbm=" + classnumber + "&xzxjxjhm=" + year
+    
+    def get_table(self, usr, psw, year, term, classnumber):
+        table = {}
+        address = self.make_addpatten(year, term, classnumber)
+        ids = Ids()
+        self.cookies, pic = ids.get_ids_cookie(usr, psw)
+        self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookies))
+        result = self.opener.open(address)
+        tableHtml = result.read().decode('gbk')
+    
+        #每节课包含的所有课程
+        periodPatten = re.compile(r'<td width="12%" >\s*.*?\s*<tr bg', re.S)
+        period = re.findall(periodPatten, tableHtml)
+        
+        courses = []    #存储每节课的课程
+        for course in period:   #从每节课中提取出课程
+            coursepatten = re.compile(r'<td width="12%" valign="top">.*?</td>', re.S)
+            items = re.findall(coursepatten, course)
+            for item in items:
+                patten = re.compile(r' (.*?)<br>')
+                courses.append(re.findall(patten, item))
+            if courses != [[],[],[],[],[],[],[]]:
+                headpatten = re.compile(r'<td width="12%" >(.*?)</td>', re.S)
+                table[re.findall(headpatten, course)[0]] = courses
+            courses = []
+
         return table
