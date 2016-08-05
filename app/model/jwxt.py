@@ -79,6 +79,7 @@ class Jwxt:
     def make_addpatten(self, year, term, classnumber):
         return "http://jwxt.xidian.edu.cn/bjKbInfoAction.do?oper=bjkb_xx&xzxjxjhh="+ year + "-" + term + "-1&xbjh=" + classnumber + "&xbm=" + classnumber + "&xzxjxjhm=" + year
     
+    
     def get_table(self, usr, psw, year, term, classnumber):
         table = {}
         address = self.make_addpatten(year, term, classnumber)
@@ -98,10 +99,37 @@ class Jwxt:
             items = re.findall(coursepatten, course)
             for item in items:
                 patten = re.compile(r' (.*?)<br>')
-                courses.append(re.findall(patten, item))
+                its = re.findall(patten, item)
+                for it in its:
+                    print it
+                    coursemessagepatten = re.compile(r'(.*?)\(.*?,(.*?),(.*?),(.*?)\)', re.S)
+                    coursemessagelist = re.findall(coursemessagepatten, it)
+                    print coursemessagelist
+                    for i in coursemessagelist:
+                        print i 
+                    weeks = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+                    count = 0
+                    for weeknumber in coursemessagelist[2]:
+                        if weeknumber <= '20' and weeknumber >= '1':
+                            weeks[int(wekknumber)] = 1
+                        
+                        elif weeknumber == '-':
+                            suite
+                            for i = int(coursemessagelist[2],index(weeknumber) - 1) + 1 in range(coursemessagelist[2],index(weeknumber) + 1 - coursemessagelist[2],index(weeknumber) - 1 )
+                                weeks[i] = 1
+                        else:
+                            pass
+                        count += 1
+                    
+                    coursemessagelist[2] = weeks
+                    weeks = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+                    count = 0
+                courses.append(its)
             if courses != [[],[],[],[],[],[],[]]:
                 headpatten = re.compile(r'<td width="12%" >(.*?)</td>', re.S)
+                
                 table[re.findall(headpatten, course)[0]] = courses
+                
             courses = []
 
         return table
