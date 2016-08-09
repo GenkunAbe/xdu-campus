@@ -17,6 +17,7 @@ import urllib
 import urllib2
 import re
 import json
+import sys
 
 
 def list_decode(items):
@@ -42,12 +43,12 @@ class Jwxt:
     # return:
     #     grades    : a dict which has all grades.
     def get_grade(self, usr, psw):
-        grade = "http://jwxt.xidian.edu.cn/gradeLnAllAction.do?type=ln&oper=qbinfo"
+        gradeurl = "http://jwxt.xidian.edu.cn/gradeLnAllAction.do?type=ln&oper=qbinfo"
         grade = {}
         ids = Ids()
         self.cookies, pic = ids.get_ids_cookie(usr, psw)
         self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookies))
-        result = self.opener.open(grade)
+        result = self.opener.open(graderul)
         html = result.read()
         patten = re.compile(r'<a name=".*?" />.*?<td height="21"', re.S)
         terms = re.findall(patten, html)
@@ -80,51 +81,55 @@ class Jwxt:
         return "http://jwxt.xidian.edu.cn/bjKbInfoAction.do?oper=bjkb_xx&xzxjxjhh="+ year + "-" + term + "-1&xbjh=" + classnumber + "&xbm=" + classnumber + "&xzxjxjhm=" + year
     
     
+
+    def get_week(self, weeks):
+        result = [0 for i in range(21)]
+        p0 = re.compile(u'[\u4e00-\u9fa5]*')
+        weeks = p0.sub('', weeks)
+        p1 = re.compile(r',')
+        items = re.split(p1, weeks)
+        for item in items:
+            p2 = re.compile(r'-')
+            num = re.split(p2, item)
+            if len(num) == 2:
+                for i in range(int(num[0]), int(num[1]) + 1):
+                    result[i] = 1
+            else:
+                result[int(num[0])] = 1
+        return result
+        
+
     def get_table(self, usr, psw, year, term, classnumber):
         table = {}
         address = self.make_addpatten(year, term, classnumber)
         ids = Ids()
-        self.cookies, pic = ids.get_ids_cookie(usr, psw)
+        self.cookies, pic = ids.get_ids_cookie(usr, psw, 'ids')
         self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookies))
         result = self.opener.open(address)
         tableHtml = result.read().decode('gbk')
-    
         #每节课包含的所有课程
         periodPatten = re.compile(r'<td width="12%" >\s*.*?\s*<tr bg', re.S)
         period = re.findall(periodPatten, tableHtml)
         
         courses = []    #存储每节课的课程
         for course in period:   #从每节课中提取出课程
+
             coursepatten = re.compile(r'<td width="12%" valign="top">.*?</td>', re.S)
             items = re.findall(coursepatten, course)
             for item in items:
                 patten = re.compile(r' (.*?)<br>')
                 its = re.findall(patten, item)
-                for it in its:
-                    print it
-                    coursemessagepatten = re.compile(r'(.*?)\(.*?,(.*?),(.*?),(.*?)\)', re.S)
-                    coursemessagelist = re.findall(coursemessagepatten, it)
-                    print coursemessagelist
-                    for i in coursemessagelist:
-                        print i 
-                    weeks = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-                    count = 0
-                    for weeknumber in coursemessagelist[2]:
-                        if weeknumber <= '20' and weeknumber >= '1':
-                            weeks[int(wekknumber)] = 1
-                        
-                        elif weeknumber == '-':
-                            suite
-                            for i = int(coursemessagelist[2],index(weeknumber) - 1) + 1 in range(coursemessagelist[2],index(weeknumber) + 1 - coursemessagelist[2],index(weeknumber) - 1 )
-                                weeks[i] = 1
-                        else:
-                            pass
-                        count += 1
+                for i in range(len(its)):
                     
-                    coursemessagelist[2] = weeks
-                    weeks = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-                    count = 0
+                    coursemessagepatten = re.compile(r'(.*?)\(.*?,(.*?),(.*?),(.*?)\)', re.S)
+                    coursemessagelist = re.findall(coursemessagepatten, its[i])
+                    coursemessagelist[0] = list(coursemessagelist[0])
+                    weeks = self.get_week(coursemessagelist[0][3])
+                    coursemessagelist[0][3] = weeks
+                    its[i] = coursemessagelist[0]
+                   
                 courses.append(its)
+                
             if courses != [[],[],[],[],[],[],[]]:
                 headpatten = re.compile(r'<td width="12%" >(.*?)</td>', re.S)
                 
@@ -133,3 +138,11 @@ class Jwxt:
             courses = []
 
         return table
+
+
+if __name__ == '__main__':
+    usr = sys.argv[1]
+    psw = sys.argv[2]
+    jwxt = Jwxt()
+    table = jwxt.get_table(usr, psw, '2016-2017', '1', '1403018')
+    print table

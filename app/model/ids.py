@@ -22,8 +22,9 @@ import urllib2
 import re
 
 urls = {
-    'ids': 'http://ids.xidian.edu.cn/authserver/login?service=http%3A%2F%2Fjwxt.xidian.edu.cn%2Fcaslogin.jsp',
-    'zyzfw': 'http://zyzfw.xidian.edu.cn/'
+    'ids' : 'http://ids.xidian.edu.cn/authserver/login?service=http%3A%2F%2Fjwxt.xidian.edu.cn%2Fcaslogin.jsp',
+    'dataids' : 'http://ids.xidian.edu.cn/authserver/login?service=http%3A%2F%2Fpayment.xidian.edu.cn%2Fpages%2Fcaslogin.jsp',
+    'data' : 'http://zyzfw.xidian.edu.cn/'
 }
 
 class Ids():
@@ -41,10 +42,13 @@ class Ids():
     # Error:
     #     LoginErr  : raise LoginErr when the username or password
     #                 is wrong.       
-    def get_ids_cookie(self, usr, psw):
+    def get_ids_cookie(self, usr, psw, type):
 
         # Get Login Page
-        html = self.get_page()
+        if type == 'ids':
+            html = self.get_page('ids')
+        elif type =='dataids':
+            html = self.get_page('dataids')
         if (self.has_code(html)):
             # If need verification code
             pic = self.get_pic(html)
@@ -85,10 +89,10 @@ class Ids():
 
 
 
-    def get_zyzfw_cookie(self, usr, psw):
+    def get_data_cookie(self, usr, psw, ver):
 
         # Get Login Page
-       # html = self.get_page('ids')
+        html = self.get_page('data')
         if (self.has_code(html)):
             # If need verification code
             pic = self.get_pic(html)
@@ -103,13 +107,18 @@ class Ids():
         value = re.findall(pattern, content)
         self._csrf = value[0]
 
-        self.postdata2 = urllib.urlencode({
+        postdata = urllib.urlencode({
             'loginform-username' : usr,
             'loginform-password':psw,
-            'loginform-verifycode':"",
+            'loginform-verifycode':ver,
             'csrf-token':self.csrf,
             '_csrf':self._csrf
         })
+
+        request = urllib2.Request(
+            url = urls['data'],
+            data = posydata)
+        result = self.opener.open(request)
 
         # Try Login
         try:
@@ -125,14 +134,15 @@ class Ids():
     # This function return raw html text for further operation
     # return:
     #     html      : Login page html text
-    def get_page(self):
+    def get_page(self, type):
         self.cookies = cookielib.CookieJar()
         self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookies))
-        response = self.opener.open(urls['ids'])
-        # if 'url' == 'ids':
-        #     response = self.opener.open(urls['ids'])
-        # else if 'url' == 'zyzfw':
-        #     response = self.opener.open(urls['zyzfw'])
+        if type == 'ids':
+            response = self.opener.open(urls['ids'])
+        elif type == 'data':
+            response = self.opener.open(urls['data'])
+        elif type == 'dataids':
+            response = self.opener.open(urls['dataids'])
 
         content = response.read().decode('utf-8')
         return content
