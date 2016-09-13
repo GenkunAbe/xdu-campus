@@ -46,7 +46,7 @@ class Jwxt:
         gradeurl = "http://jwxt.xidian.edu.cn/gradeLnAllAction.do?type=ln&oper=qbinfo"
         grade = {}
         ids = Ids()
-        self.cookies, pic = ids.get_ids_cookie(usr, psw)
+        self.cookies, pic = ids.get_ids_cookie(usr, psw, 'ids')
         self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookies))
         result = self.opener.open(graderul)
         html = result.read()
