@@ -20,12 +20,31 @@ import cookielib
 import urllib
 import urllib2
 import re
+import sys
+import requests
+import Cookie
+from requests import Request, Session
+
 
 urls = {
     'ids' : 'http://ids.xidian.edu.cn/authserver/login?service=http%3A%2F%2Fjwxt.xidian.edu.cn%2Fcaslogin.jsp',
     'dataids' : 'http://ids.xidian.edu.cn/authserver/login?service=http%3A%2F%2Fpayment.xidian.edu.cn%2Fpages%2Fcaslogin.jsp',
-    'data' : 'http://zyzfw.xidian.edu.cn/'
 }
+
+
+
+class AddCookieHandle(urllib2.BaseHandler):
+    def __init__(self, cookieValue):
+        self.cookieValue = cookieValue
+    
+    def http_request(self, req):
+        if not req.has_header('Cookie'):
+            req.add_unredirected_header('Cookie', self.cookieValue)
+        else:
+            cookie = req.get_header('Cookie')
+            req.add_unredirected_header('Cookie', self.cookieValue + '; ' + cookie)
+        return req
+
 
 class Ids():
 
@@ -45,10 +64,8 @@ class Ids():
     def get_ids_cookie(self, usr, psw, type):
 
         # Get Login Page
-        if type == 'ids':
-            html = self.get_page('ids')
-        elif type =='dataids':
-            html = self.get_page('dataids')
+        
+        html = self.get_page('ids')
         if (self.has_code(html)):
             # If need verification code
             pic = self.get_pic(html)
@@ -87,65 +104,13 @@ class Ids():
         # # 如果没有触发异常，那么就算是成功了
         return self.cookies, None
 
+    
 
 
-    def get_data_cookie(self, usr, psw, ver):
-
-        # Get Login Page
-        html = self.get_page('data')
-        if (self.has_code(html)):
-            # If need verification code
-            pic = self.get_pic(html)
-            return None, pic
-
-        # Get Hidden Values
-        pattern = re.compile(r'name="csrf-token" content="(.*?)"', re.S)
-        value = re.findall(pattern, content)
-        self.csrf = value[0]
-        
-        pattern = re.compile(r'"hidden" name=".*?" value="(.*?)"', re.S)
-        value = re.findall(pattern, content)
-        self._csrf = value[0]
-
-        postdata = urllib.urlencode({
-            'loginform-username' : usr,
-            'loginform-password':psw,
-            'loginform-verifycode':ver,
-            'csrf-token':self.csrf,
-            '_csrf':self._csrf
-        })
-
-        request = urllib2.Request(
-            url = urls['data'],
-            data = posydata)
-        result = self.opener.open(request)
-
-        # Try Login
-        try:
-            # 如果解码失败了，一般都是账号密码错了
-            pass
-        except:
-            raise LoginErr
-        
-        # 如果没有触发异常，那么就算是成功了
-        return self.cookie, None
-
-
-    # This function return raw html text for further operation
-    # return:
-    #     html      : Login page html text
     def get_page(self, type):
         self.cookies = cookielib.CookieJar()
-        self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookies))
-        if type == 'ids':
-            response = self.opener.open(urls['ids'])
-        elif type == 'data':
-            response = self.opener.open(urls['data'])
-        elif type == 'dataids':
-            response = self.opener.open(urls['dataids'])
-
-        content = response.read().decode('utf-8')
-        return content
+        r = requests.get(urls['ids'])
+        return r.text
 
 
     # Just like self.get_cookie()
@@ -176,4 +141,4 @@ class Ids():
         return None
 
 
-#class LoginErr(Error):    
+#class LoginErr(Error):  
