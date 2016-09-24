@@ -14,5 +14,5 @@ app = tornado.web.Application([
 ] + url)
 
 if __name__ == '__main__':
-    app.listen(8888)
+    app.listen(5969)
     tornado.ioloop.IOLoop.instance().start()
