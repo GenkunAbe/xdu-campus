@@ -101,7 +101,7 @@ class Jwxt:
         address = self.make_addpatten(year, term, classnumber)
         ids = Ids()
         self.s = ids.ids_login(usr, psw)
-        tableHtml = self.s.get(address).text.decode('gbk')
+        tableHtml = self.s.get(address).text
         #每节课包含的所有课程
         periodPatten = re.compile(r'<td width="12%" >\s*.*?\s*<tr bg', re.S)
         period = re.findall(periodPatten, tableHtml)

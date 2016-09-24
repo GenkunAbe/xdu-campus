@@ -82,11 +82,9 @@ class Ids():
             '_eventId':self._even,
             'rmShown':self.rm
         }
-        print postdata
 
         
-        result = self.s.post(url, data = postdata)
-        print result.text
+        self.s.post(url, data = postdata)
         # html = result.read().decode('gbk')
         # print html
         # try:
