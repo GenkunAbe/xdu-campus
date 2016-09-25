@@ -12,7 +12,7 @@ class Zyzfw:
     def __init__ (self):
         self.s = requests.session()
 
-    def data_login(self, usr, psw):
+    def dataflow_login(self, usr, psw):
         html = self.s.get(url).text
         ver_patten = re.compile(r'<img id="loginform-verifycode-image" src="(.*?)"', re.S)
         ver_url = url + re.findall(ver_patten, html)[0]
