@@ -10,7 +10,7 @@ url = [
     (r'/grade', GradeCtrl),
     (r'/table', TableCtrl),
     # (r'/library', LibraryCtrl),
-    (r'/data', DataflowCtrl),
+    (r'/dataflow', DataflowCtrl),
     (r'/datacharge', DatachargeCtrl)
     # (r'/net', NetCtrl),
     # (r'/news', NewsCtrl),
