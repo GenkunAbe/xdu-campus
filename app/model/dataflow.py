@@ -30,10 +30,10 @@ class Dataflow:
     def __init__(self):
         pass
 
-    def get_data_message(self, usr, psw):
+    def get_data_message(self, ver):
         data = {}
         zyz = Zyzfw()
-        s = zyz.dataflow_login(usr, psw)
+        s = zyz.dataflow_login_post(ver)
         datahtml = s.get(dataurls['datamessage']).text
         bodypatten = re.compile(r'<tbody>\s*.*?\s*</tbody>', re.S)
         databody = re.findall(bodypatten, datahtml)
@@ -48,6 +48,11 @@ class Dataflow:
             message.append(datamessage[i])
         data['message'] = message
         return data
+
+    def get_data_ver(self, usr, psw):
+        zyz = Zyzfw()
+        ver = zyz.dataflow_login_get(usr, psw)
+        return ver
     
     def  domitorycharge(self, usr, psw, subpaypro, summary, domitorytype):
         datacharge = Datazyz()
