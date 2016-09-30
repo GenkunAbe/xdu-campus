@@ -23,10 +23,9 @@ import sys
 def list_decode(items):
     ans = []
     for i in range(len(items) - 1):
-        ans.append(items[i].decode('gbk').encode('utf-8'))
-    pattern = re.compile(r'">(.+?)&nbsp;')
-    grade = re.findall(pattern, items[-1])[0]
-    grade = grade.decode('gbk').encode('utf-8')
+        ans.append(items[i])
+    patten = re.compile(r'">(.+?)&nbsp;', re.S)
+    grade = re.findall(patten, items[-1])[0]
     ans.append(grade)
     return ans
      
@@ -34,7 +33,7 @@ def list_decode(items):
 class Jwxt:
 
     def __init__(self):
-        self.cookie = cookielib.CookieJar()
+        self.s = requests.session()
 
 
     # paras:
@@ -46,10 +45,8 @@ class Jwxt:
         gradeurl = "http://jwxt.xidian.edu.cn/gradeLnAllAction.do?type=ln&oper=qbinfo"
         grade = {}
         ids = Ids()
-        self.cookies, pic = ids.get_ids_cookie(usr, psw, 'ids')
-        self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookies))
-        result = self.opener.open(graderul)
-        html = result.read()
+        self.s = ids.ids_login(usr, psw)
+        html = self.s.get(gradeurl).text
         patten = re.compile(r'<a name=".*?" />.*?<td height="21"', re.S)
         terms = re.findall(patten, html)
         for term in terms:
@@ -67,7 +64,7 @@ class Jwxt:
                 
             
             headpatten = re.compile(r'<a name="(.*?)" />.+?<td height="21"', re.S)
-            grade[re.findall(headpatten, term)[0].decode('gbk').encode('utf-8')] = courses
+            grade[re.findall(headpatten, term)[0]] = courses
         
         return grade
 
@@ -103,10 +100,8 @@ class Jwxt:
         table = {}
         address = self.make_addpatten(year, term, classnumber)
         ids = Ids()
-        self.cookies, pic = ids.get_ids_cookie(usr, psw, 'ids')
-        self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookies))
-        result = self.opener.open(address)
-        tableHtml = result.read().decode('gbk')
+        self.s = ids.ids_login(usr, psw)
+        tableHtml = self.s.get(address).text
         #每节课包含的所有课程
         periodPatten = re.compile(r'<td width="12%" >\s*.*?\s*<tr bg', re.S)
         period = re.findall(periodPatten, tableHtml)

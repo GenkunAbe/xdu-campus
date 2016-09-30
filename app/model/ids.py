@@ -25,13 +25,7 @@ import requests
 import Cookie
 from requests import Request, Session
 
-
-urls = {
-    'ids' : 'http://ids.xidian.edu.cn/authserver/login?service=http%3A%2F%2Fjwxt.xidian.edu.cn%2Fcaslogin.jsp',
-    'dataids' : 'http://ids.xidian.edu.cn/authserver/login?service=http%3A%2F%2Fpayment.xidian.edu.cn%2Fpages%2Fcaslogin.jsp',
-}
-
-
+url = 'http://ids.xidian.edu.cn/authserver/login?service=http%3A%2F%2Fjwxt.xidian.edu.cn%2Fcaslogin.jsp'
 
 class AddCookieHandle(urllib2.BaseHandler):
     def __init__(self, cookieValue):
@@ -49,7 +43,7 @@ class AddCookieHandle(urllib2.BaseHandler):
 class Ids():
 
     def __init__(self):
-        pass
+        self.s = requests.session()
         
     # paras:
     #     usr       : username
@@ -61,11 +55,11 @@ class Ids():
     # Error:
     #     LoginErr  : raise LoginErr when the username or password
     #                 is wrong.       
-    def get_ids_cookie(self, usr, psw, type):
+    def ids_login(self, usr, psw):
 
         # Get Login Page
         
-        html = self.get_page('ids')
+        html = self.s.get(url).text
         if (self.has_code(html)):
             # If need verification code
             pic = self.get_pic(html)
@@ -80,19 +74,17 @@ class Ids():
         self.rm = values[3]
 
         # Try Login
-        postdata = urllib.urlencode({
+        postdata = {
             'username' : usr,
             'password' : psw,
             'lt':self.lt,
             'execution':self.exe,
             '_eventId':self._even,
             'rmShown':self.rm
-        })
+        }
 
-        request = urllib2.Request(
-            url = urls['ids'],
-            data = postdata)
-        result = self.opener.open(request)
+        
+        self.s.post(url, data = postdata)
         # html = result.read().decode('gbk')
         # print html
         # try:
@@ -102,17 +94,8 @@ class Ids():
         #     raise LoginErr
         
         # # 如果没有触发异常，那么就算是成功了
-        return self.cookies, None
-
+        return self.s
     
-
-
-    def get_page(self, type):
-        self.cookies = cookielib.CookieJar()
-        r = requests.get(urls['ids'])
-        return r.text
-
-
     # Just like self.get_cookie()
     # 下面三个先不写吧
     def get_cookie_code(self, usr, psw, code):

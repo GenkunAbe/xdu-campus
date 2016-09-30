@@ -11,9 +11,6 @@
 
 """
 
-import cookielib
-import urllib
-import urllib2
 import re
 import json
 from zyz import *
@@ -28,15 +25,15 @@ dataurls = {
     'dx' : 'http://payment.xidian.edu.cn/utildetails514'
 }
 
-class Data:
+class Dataflow:
 
     def __init__(self):
         pass
 
-    def get_data_message(self, usr, psw):
+    def get_data_message(self, ver):
         data = {}
         zyz = Zyzfw()
-        s = zyz.data_login(usr, psw)
+        s = zyz.dataflow_login_post(ver)
         datahtml = s.get(dataurls['datamessage']).text
         bodypatten = re.compile(r'<tbody>\s*.*?\s*</tbody>', re.S)
         databody = re.findall(bodypatten, datahtml)
@@ -51,6 +48,11 @@ class Data:
             message.append(datamessage[i])
         data['message'] = message
         return data
+
+    def get_data_ver(self, usr, psw):
+        zyz = Zyzfw()
+        ver = zyz.dataflow_login_get(usr, psw)
+        return ver
     
     def  domitorycharge(self, usr, psw, subpaypro, summary, domitorytype):
         datacharge = Datazyz()
@@ -66,7 +68,6 @@ class Data:
         result = json.loads(result.text)
         result = s.get('http://payment.xidian.edu.cn/showUserSelectPayType23' + str(result['payOrderTrade']['id']))
         html = result.text
-
         p = re.compile(r'<input type="hidden".*?value=[\'|\"](.*?)[\'|\"].*?/>', re.S)
         values = re.findall(p, html)
         data = {
@@ -83,7 +84,10 @@ class Data:
         postdata = dict(values)
 
         result = s.post('https://mapi.alipay.com/gateway.do?_input_charset=utf-8', data=postdata)
-        print result.text
+        # with open('result.html', 'w') as f:
+        #     f.write(result.text.encode('utf8'))
+        # print result.text
+        return result.text
 
 
     def datacharge(self):

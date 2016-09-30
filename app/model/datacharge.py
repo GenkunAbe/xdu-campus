@@ -53,6 +53,7 @@ class Datazyz:
                 'captchaResponse':ver
             }
             result = self.s.post(url, data = postdata)
+            print result.text
         pattern = re.compile(r'href="(.+?)"', re.S)
         link = re.findall(pattern, result.text)[0]
         link = 'http://payment.xidian.edu.cn' + link
